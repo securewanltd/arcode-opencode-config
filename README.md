@@ -1,1 +1,1 @@
-arcode
+arcode-opencode-config
