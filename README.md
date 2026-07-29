@@ -1,1 +1,1 @@
-# opencode-agent
+arcode
