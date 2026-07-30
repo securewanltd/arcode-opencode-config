@@ -7,10 +7,16 @@
 .DESCRIPTION
     Prepares a bare Windows machine for opencode + arcode-opencode-config:
     - Checks/Installs Node.js/npm via winget (if available)
+    - Checks/Installs git via winget (if available) for general plugin compatibility
     - Checks/Installs opencode CLI
     - Checks/Installs MCP prerequisites (codegraph, lsp-mcp, websearch-mcp)
     - Verifies remote MCP endpoints (context7, grep_app) reachability
     - Configures opencode.json with the arcode-opencode-config plugin tuple
+
+    The plugin is referenced by a GitHub tarball URL so that opencode can fetch it
+    without requiring git to be installed on the machine (unlike the `github:owner/repo`
+    npm spec). Git is still installed when missing because it is broadly useful for
+    other plugins and workflows.
 
     Use -SkipOpencode to skip opencode installation.
     Use -SkipMcp to skip MCP prerequisite installation/verification.
@@ -45,6 +51,7 @@ param(
 # Status collector
 $Status = @{
     NodeNpm = $null
+    Git = $null
     Opencode = $null
     Codegraph = $null
     "lsp-mcp" = $null
@@ -165,7 +172,52 @@ function Install-NodeNpm {
     }
 }
 
-# --- Stage 2: opencode CLI ---
+# --- Stage 2: git ---
+
+function Install-Git {
+    if (Test-CommandOnPath "git") {
+        Write-Step "git already available on PATH"
+        $Status.Git = "OK"
+        return
+    }
+
+    Write-Step "git not found on PATH"
+
+    if (-not (Test-CommandOnPath "winget")) {
+        Write-Warning "winget not available. Cannot auto-install git. The arcode-opencode-config plugin uses a tarball URL so it does not require git, but other plugins using the 'github:' npm install spec may fail on this machine. Install git to avoid that issue."
+        $Status.Git = "MISSING"
+        return
+    }
+
+    Write-Step "winget found; installing Git"
+    if ($env:ARCODE_INSTALL_DRYRUN -eq '1') {
+        Write-Step "DRY RUN: would run winget install Git.Git --accept-source-agreements --accept-package-agreements"
+        $Status.Git = "SKIPPED"
+        return
+    }
+
+    try {
+        & winget install Git.Git --accept-source-agreements --accept-package-agreements
+        if ($LASTEXITCODE -ne 0) {
+            throw "winget exited with exit code $LASTEXITCODE"
+        }
+        Write-Step "winget git installation reported success"
+        Update-ProcessPathFromRegistry
+
+        if (Test-CommandOnPath "git") {
+            Write-Step "git is now available on PATH"
+            $Status.Git = "INSTALLED"
+        } else {
+            Write-Warning "git still not on PATH after winget install. The arcode-opencode-config plugin uses a tarball URL so it does not require git, but other plugins using the 'github:' npm install spec may fail on this machine. Restart the terminal and re-run."
+            $Status.Git = "MISSING"
+        }
+    } catch {
+        Write-Warning "winget install git failed: $_"
+        $Status.Git = "MISSING"
+    }
+}
+
+# --- Stage 3: opencode CLI ---
 
 function Install-OpencodeCli {
     if (Test-CommandOnPath "opencode") {
@@ -209,7 +261,7 @@ function Install-OpencodeCli {
     }
 }
 
-# --- Stage 3: MCP prerequisites ---
+# --- Stage 4: MCP prerequisites ---
 
 function Install-CodegraphCli {
     if ($SkipMcp) {
@@ -310,10 +362,19 @@ function Test-RemoteMcp($url, $statusKey) {
     }
 }
 
-# --- Stage 4: Plugin config ---
+# --- Stage 5: Plugin config ---
+
+function Test-ManagedPluginEntry($firstElement) {
+    $oldSpec = "github:$Repo"
+    $tarballPrefix = "https://github.com/$Repo/archive/refs/heads/"
+    $tarballSuffix = ".tar.gz"
+    if ($firstElement -eq $oldSpec) { return $true }
+    if ($firstElement -and $firstElement.StartsWith($tarballPrefix) -and $firstElement.EndsWith($tarballSuffix)) { return $true }
+    return $false
+}
 
 function Write-PluginConfig {
-    $PluginIdentifier = "github:$Repo"
+    $PluginIdentifier = "https://github.com/$Repo/archive/refs/heads/$Branch.tar.gz"
     $ManifestUrl = "https://raw.githubusercontent.com/$Repo/$Branch/manifest.json"
 
     $configDir = Join-Path $env:USERPROFILE ".config\opencode"
@@ -353,17 +414,17 @@ function Write-PluginConfig {
     $pluginArray = [System.Collections.ArrayList]::new()
     $found = $false
     foreach ($entry in $config.plugin) {
-        if ($entry -is [System.Array] -and $entry.Length -gt 0 -and $entry[0] -eq $PluginIdentifier) {
+        if ($entry -is [System.Array] -and $entry.Length -gt 0 -and (Test-ManagedPluginEntry $entry[0])) {
             [void]$pluginArray.Add(@($PluginIdentifier, @{ manifestUrl = $ManifestUrl }))
             $found = $true
-            Write-Step "Replaced existing $PluginIdentifier entry"
+            Write-Step "Replaced existing managed plugin entry"
         } else {
             [void]$pluginArray.Add($entry)
         }
     }
     if (-not $found) {
         [void]$pluginArray.Add(@($PluginIdentifier, @{ manifestUrl = $ManifestUrl }))
-        Write-Step "Added new $PluginIdentifier entry"
+        Write-Step "Added new managed plugin entry"
     }
 
     $config.plugin = $pluginArray.ToArray()
@@ -385,24 +446,28 @@ if ($Repo -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
     throw "Repo must be in owner/name format (e.g. myorg/arcode-opencode-config). Got: $Repo"
 }
 
-Write-Header "Stage 1/5: Node.js / npm"
+Write-Header "Stage 1/6: Node.js / npm"
 Install-NodeNpm
 
-Write-Header "Stage 2/5: opencode CLI"
+Write-Header "Stage 2/6: git"
+Install-Git
+
+Write-Header "Stage 3/6: opencode CLI"
 Install-OpencodeCli
 
-Write-Header "Stage 3/5: MCP prerequisites"
+Write-Header "Stage 4/6: MCP prerequisites"
 Install-CodegraphCli
 Install-NpmMcpTool "lsp-mcp" "lsp-mcp.cmd"
 Install-NpmMcpTool "websearch-mcp" "websearch-mcp.cmd"
 Test-RemoteMcp "https://mcp.context7.com/mcp" "Context7"
 Test-RemoteMcp "https://mcp.grep.app" "GrepApp"
 
-Write-Header "Stage 4/5: arcode-opencode-config plugin config"
+Write-Header "Stage 5/6: arcode-opencode-config plugin config"
 Write-PluginConfig
 
-Write-Header "Stage 5/5: Summary"
+Write-Header "Stage 6/6: Summary"
 Write-Status "Node.js / npm" $Status.NodeNpm
+Write-Status "git" $Status.Git
 Write-Status "opencode CLI" $Status.Opencode
 Write-Status "codegraph" $Status.Codegraph
 Write-Status "lsp-mcp" $Status["lsp-mcp"]
@@ -413,8 +478,8 @@ Write-Status "arcode plugin cfg" $Status.PluginConfig
 
 Write-Header "Next steps"
 Write-Host @"
-1. Restart the terminal so PATH changes (Node.js, opencode, MCP tools) take effect.
-2. Restart opencode so the arcode-opencode-config plugin fetches the manifest from:
+1. Restart the terminal so PATH changes (Node.js, git, opencode, MCP tools) take effect.
+2. Restart opencode so the arcode-opencode-config plugin is downloaded from the tarball and fetches the manifest from:
    https://raw.githubusercontent.com/$Repo/$Branch/manifest.json
 3. Edit manifest.json on GitHub; the next opencode start on every machine will pull the updated agents, MCP servers, and config keys.
 "@

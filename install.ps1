@@ -5,10 +5,13 @@
     One-time onboarding script for arcode-opencode-config.
 
 .DESCRIPTION
-    Configures opencode.json to load the arcode-opencode-config plugin from a GitHub repository.
+    Configures opencode.json to load the arcode-opencode-config plugin from a GitHub repository tarball.
     Preserves existing config keys and other plugin entries.
     Optionally installs the local MCP server prerequisites (lsp-mcp, websearch-mcp) via npm
     and verifies that codegraph is on PATH. Use -SkipMcp to disable MCP installation.
+
+    The plugin is referenced by a GitHub tarball URL so that opencode can fetch it without
+    requiring git to be installed on the machine (unlike the `github:owner/repo` npm spec).
 
 .PARAMETER Repo
     GitHub repository in owner/name format. Defaults to "securewanltd/arcode-opencode-config".
@@ -62,12 +65,46 @@ function Invoke-NpmInstallGlobal($packages) {
     }
 }
 
+function Update-ProcessPathFromRegistry {
+    # Refresh process PATH from machine+user registry values, preserving process-only additions.
+    $machinePath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    $processPath = $env:Path
+
+    $parts = [System.Collections.ArrayList]::new()
+    $seen = @{}
+
+    foreach ($part in ($processPath -split ";")) {
+        if ($part -and -not $seen.ContainsKey($part)) {
+            [void]$parts.Add($part)
+            $seen[$part] = $true
+        }
+    }
+    foreach ($part in (($userPath -split ";") + ($machinePath -split ";"))) {
+        if ($part -and -not $seen.ContainsKey($part)) {
+            [void]$parts.Add($part)
+            $seen[$part] = $true
+        }
+    }
+
+    $env:Path = $parts -join ";"
+}
+
+function Test-ManagedPluginEntry($firstElement) {
+    $oldSpec = "github:$Repo"
+    $tarballPrefix = "https://github.com/$Repo/archive/refs/heads/"
+    $tarballSuffix = ".tar.gz"
+    if ($firstElement -eq $oldSpec) { return $true }
+    if ($firstElement -and $firstElement.StartsWith($tarballPrefix) -and $firstElement.EndsWith($tarballSuffix)) { return $true }
+    return $false
+}
+
 # Validate repo format
 if ($Repo -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
     throw "Repo must be in owner/name format (e.g. myorg/arcode-opencode-config). Got: $Repo"
 }
 
-$PluginIdentifier = "github:$Repo"
+$PluginIdentifier = "https://github.com/$Repo/archive/refs/heads/$Branch.tar.gz"
 $ManifestUrl = "https://raw.githubusercontent.com/$Repo/$Branch/manifest.json"
 
 $configDir = Join-Path $env:USERPROFILE ".config\opencode"
@@ -107,17 +144,17 @@ if (-not (Get-Member -InputObject $config -Name 'plugin' -MemberType NotePropert
 $pluginArray = [System.Collections.ArrayList]::new()
 $found = $false
 foreach ($entry in $config.plugin) {
-    if ($entry -is [System.Array] -and $entry.Length -gt 0 -and $entry[0] -eq $PluginIdentifier) {
+    if ($entry -is [System.Array] -and $entry.Length -gt 0 -and (Test-ManagedPluginEntry $entry[0])) {
         [void]$pluginArray.Add(@($PluginIdentifier, @{ manifestUrl = $ManifestUrl }))
         $found = $true
-        Write-Step "Replaced existing $PluginIdentifier entry"
+        Write-Step "Replaced existing managed plugin entry"
     } else {
         [void]$pluginArray.Add($entry)
     }
 }
 if (-not $found) {
     [void]$pluginArray.Add(@($PluginIdentifier, @{ manifestUrl = $ManifestUrl }))
-    Write-Step "Added new $PluginIdentifier entry"
+    Write-Step "Added new managed plugin entry"
 }
 
 $config.plugin = $pluginArray.ToArray()
@@ -162,6 +199,8 @@ if (-not $SkipMcp) {
             }
         }
 
+        Update-ProcessPathFromRegistry
+
         # Re-verify after install attempt so the summary reflects actual PATH state.
         foreach ($tool in $npmTools) {
             if (Test-CommandOnPath $tool.command) {
@@ -197,7 +236,7 @@ if (-not $SkipMcp) {
 
 Write-Header "Next steps"
 Write-Host @"
-1. Restart opencode so the arcode-opencode-config plugin fetches the manifest from:
+1. Restart opencode so the arcode-opencode-config plugin is downloaded from the tarball and fetches the manifest from:
    $ManifestUrl
 
 2. If codegraph.cmd is missing from PATH, install the codegraph CLI from the official distribution, ensure it is on PATH, and restart opencode.

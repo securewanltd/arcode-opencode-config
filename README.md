@@ -14,24 +14,25 @@
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │  GitHub / GitHub Enterprise                                                     │
 │  securewanltd/arcode-opencode-config/main/manifest.json  ←  JSON Schema ile     │
-│  doğrulanır                                                                     │
-└──────────────────────────┬──────────────────────────────────────────────────────┘
+│  doğrulanır                                                                      │
+└──────────────────────────┬────────────────────────────────────────────────────────┘
                            │ fetch + Bearer token (isteğe bağlı)
                            ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│  arcode-opencode-config eklentisi (npm paketi)                                  │
-│  - opencode.json içinde `plugin` dizisine tanımlı                               │
-│  - Başlangıçta manifesti çeker                                                  │
-│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json kullanır      │
-│  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder               │
-└──────────────────────────┬──────────────────────────────────────────────────────┘
+│  arcode-opencode-config eklentisi                                                │
+│  - opencode.json içinde `plugin` dizisine tarball URL'si olarak tanımlı          │
+│  - Başlangıçta manifesti çeker                                                   │
+│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json kullanır        │
+│  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder                │
+└──────────────────────────┬────────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│  GPO ile dağıtılan opencode.json                                                │
-│  C:\ProgramData\opencode\opencode.json                                          │
-│  { plugin: [["github:securewanltd/arcode-opencode-config",                      │
-│             { manifestUrl: "..." }]] }                                          │
+│  GPO ile dağıtılan opencode.json                                                  │
+│  C:\ProgramData\opencode\opencode.json                                           │
+│  { plugin: [["https://github.com/securewanltd/arcode-opencode-config/             │
+│             archive/refs/heads/main.tar.gz",                                     │
+│             { manifestUrl: "..." }]] }                                            │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -41,16 +42,14 @@
 
 ## Kurulum
 
-```bash
-npm install arcode-opencode-config
-```
+Bu proje npm'de yayınlanmamıştır. opencode, plugin girdilerini bir GitHub tarball URL'sinden indirebilir; böylece hedef makinede git kurulu olmasına gerek kalmaz (npm'nin `github:owner/repo` spec'i git gerektirir).
 
 opencode yapılandırmanıza eklentiyi tuple formunda ekleyin:
 
 ```json
 {
   "plugin": [
-    ["arcode-opencode-config", {
+    ["https://github.com/securewanltd/arcode-opencode-config/archive/refs/heads/main.tar.gz", {
       "manifestUrl": "https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.json"
     }]
   ]
@@ -77,13 +76,20 @@ Farklı bir repo kullanmak için:
 `bootstrap.ps1` aşağıdaki adımları idempotent olarak yapar:
 
 1. **Node.js / npm** kontrolü: Eksikse ve `winget` varsa `winget install OpenJS.NodeJS.LTS` ile kurar. Yeniden başlatma gerektirebilir; script devam eder ve son özet bildirir.
-2. **opencode CLI** kontrolü/kurulumu: Eksikse `npm install -g opencode-ai` çalıştırır.
-3. **MCP ön koşulları**:
+2. **git** kontrolü: Eksikse ve `winget` varsa `winget install Git.Git` ile kurar. Eklentinin kendisi tarball URL'si kullandığı için git şart değildir, ancak diğer `github:` spec ile yüklenen plugin'ler için git gerekebilir; bu yüzden kurulum denenir, başarısızlık durumunda sadece uyarı verilir ve script devam eder.
+3. **opencode CLI** kontrolü/kurulumu: Eksikse `npm install -g opencode-ai` çalıştırır.
+4. **MCP ön koşulları**:
    - `codegraph` CLI: Resmi installer (`irm ... | iex`) ile kurar, USER PATH'e ekler ve mevcut oturum PATH'ine prepends eder.
    - `lsp-mcp` ve `websearch-mcp`: Eksiklerse `npm install -g` ile kurar.
    - `context7` ve `grep_app`: Uzak MCP sunucuları; HEAD isteği ile erişilebilirlik bilgilendirmesi yapar, kurulum gerektirmez.
-4. **arcode-opencode-config plugin config** yazımı: `~/.config/opencode/opencode.json` içine `github:securewanltd/arcode-opencode-config` tuple girdisi ekler/günceller; diğer ayarları korur; `opencode.jsonc` varsa uyarır.
-5. **Özet tablo** ve sonraki adımlar (terminal/opencode yeniden başlatma).
+5. **arcode-opencode-config plugin config** yazımı: `~/.config/opencode/opencode.json` içine aşağıdaki **tarball URL** tuple girdisini ekler/günceller; eski `github:` spec ile yazılmış bir girdi varsa onu da bu tuple ile değiştirir. Diğer ayarları korur; `opencode.jsonc` varsa uyarır.
+   ```json
+   ["https://github.com/securewanltd/arcode-opencode-config/archive/refs/heads/main.tar.gz",
+    { "manifestUrl": "https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.json" }]
+   ```
+6. **Özet tablo** ve sonraki adımlar (terminal/opencode yeniden başlatma).
+
+**Neden tarball URL?** npm'nin `github:owner/repo` spec'i hedef makinede git kurulu olmasını gerektirir. Sıfır bir kurumsal makinede git olmayabilir ve bu durumda `github:` spec ile plugin sessizce yüklenemez, özel agent'lar hiç çalışmaz. GitHub tarball URL'si (`.tar.gz`) HTTP üzerinden doğrudan indirilebilir, dolayısıyla git olmadan da opencode plugin'i alabilir. Git yine de genel geliştirme iş akışları için kurulur, ancak bu eklenti için zorunlu değildir.
 
 Parametreler:
 
@@ -123,7 +129,8 @@ Farklı bir repo kullanmak için:
 2. Mevcut `opencode.json` dosyasını okur; yoksa yeni bir tane oluşturur.
 3. Aşağıdaki gibi bir plugin girdisi ekler veya günceller:
    ```json
-   ["github:securewanltd/arcode-opencode-config", { "manifestUrl": "https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.json" }]
+   ["https://github.com/securewanltd/arcode-opencode-config/archive/refs/heads/main.tar.gz",
+    { "manifestUrl": "https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.json" }]
    ```
 4. Diğer plugin girdilerini ve tüm üst düzey yapılandırma anahtarlarını korur.
 5. Aynı dizinde `opencode.jsonc` varsa uyarı verir ve elle birleştirilmesi gerektiğini söyler.
@@ -148,8 +155,10 @@ Sonrasında:
 
 ### `bootstrap.ps1` (önerilen — sıfır makine)
 
-`bootstrap.ps1` yerel MCP ön koşullarının çoğunu otomatik olarak kurar:
+`bootstrap.ps1` yerel MCP ön koşullarının çoğunu otomatik olarak kurar. Ayrıca **git**'i de kurar (veya eksikse uyarı verir): bu eklenti tarball URL kullandığı için git zorunlu değildir, ancak diğer `github:` spec plugin'ler git gerektirebilir.
 
+- **Node.js / npm**: Eksikse `winget install OpenJS.NodeJS.LTS` ile kurulur.
+- **git**: Eksikse `winget install Git.Git` ile kurulur; tarball URL kullanıldığından bu eklenti için zorunlu değildir, başarısızlık durumunda uyarı verilir ve devam edilir.
 - `lsp-mcp` / `websearch-mcp`: PATH'te aranır; eksiklerse `npm install -g` çalıştırılır.
 - `codegraph`: Resmi PowerShell installer'ı (`irm https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex`) ile kurulur. Installer USER PATH'e ekler; script mevcut oturum PATH'ine `$env:LOCALAPPDATA\codegraph\current\bin` dizinini prepend eder.
 - `context7` / `grep_app`: Uzak MCP sunucuları; kurulum gerektirmez. Script, 5 saniyelik HEAD isteği ile erişilebilirliklerini bilgilendirme amaçlı kontrol eder.
