@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/ORG/REPO/main/manifest.schema.json",
+  "$id": "https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.schema.json",
   "title": "arcode-opencode-config manifest",
   "description": "Configuration manifest consumed by the arcode-opencode-config opencode plugin",
   "type": "object",

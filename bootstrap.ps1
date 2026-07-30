@@ -17,7 +17,7 @@
     Set $env:ARCODE_INSTALL_DRYRUN='1' to log installs instead of executing them.
 
 .PARAMETER Repo
-    GitHub repository in owner/name format (required).
+    GitHub repository in owner/name format. Defaults to "securewanltd/arcode-opencode-config".
 
 .PARAMETER Branch
     Git branch, tag, or ref to pin. Defaults to "main".
@@ -29,8 +29,8 @@
     Skip opencode CLI installation.
 #>
 param(
-    [Parameter(Mandatory = $true, HelpMessage = "GitHub repository in owner/name format")]
-    [string]$Repo,
+    [Parameter(Mandatory = $false, HelpMessage = "GitHub repository in owner/name format; defaults to securewanltd/arcode-opencode-config")]
+    [string]$Repo = "securewanltd/arcode-opencode-config",
 
     [Parameter(HelpMessage = "Git branch, tag, or ref")]
     [string]$Branch = "main",

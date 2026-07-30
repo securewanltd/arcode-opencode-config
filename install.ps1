@@ -11,7 +11,7 @@
     and verifies that codegraph is on PATH. Use -SkipMcp to disable MCP installation.
 
 .PARAMETER Repo
-    GitHub repository in owner/name format (required).
+    GitHub repository in owner/name format. Defaults to "securewanltd/arcode-opencode-config".
 
 .PARAMETER Branch
     Git branch, tag, or ref to pin. Defaults to "main".
@@ -20,8 +20,8 @@
     Skip installation and verification of MCP prerequisites.
 #>
 param(
-    [Parameter(Mandatory = $true, HelpMessage = "GitHub repository in owner/name format")]
-    [string]$Repo,
+    [Parameter(Mandatory = $false, HelpMessage = "GitHub repository in owner/name format; defaults to securewanltd/arcode-opencode-config")]
+    [string]$Repo = "securewanltd/arcode-opencode-config",
 
     [Parameter(HelpMessage = "Git branch, tag, or ref")]
     [string]$Branch = "main",

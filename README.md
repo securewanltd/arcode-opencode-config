@@ -11,27 +11,28 @@
 ## Mimari
 
 ```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  GitHub / GitHub Enterprise                                         │
-│  ORG/REPO/main/manifest.json  ←  JSON Schema ile doğrulanır          │
-└──────────────────────────┬────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  GitHub / GitHub Enterprise                                                     │
+│  securewanltd/arcode-opencode-config/main/manifest.json  ←  JSON Schema ile     │
+│  doğrulanır                                                                      │
+└──────────────────────────┬────────────────────────────────────────────────────────┘
                            │ fetch + Bearer token (isteğe bağlı)
                            ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  arcode-opencode-config eklentisi (npm paketi)                      │
-│  - opencode.json içinde `plugin` dizisine tanımlı                   │
-│  - Başlangıçta manifesti çeker                                      │
-│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json   │
-│    kullanır                                                         │
-  │  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder        │
-└──────────────────────────┬────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  arcode-opencode-config eklentisi (npm paketi)                                  │
+│  - opencode.json içinde `plugin` dizisine tanımlı                                │
+│  - Başlangıçta manifesti çeker                                                   │
+│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json kullanır        │
+│  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder                │
+└──────────────────────────┬────────────────────────────────────────────────────────┘
                            │
                            ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  GPO ile dağıtılan opencode.json                                    │
-│  C:\ProgramData\opencode\opencode.json                               │
-│  { plugin: [["arcode-opencode-config", { manifestUrl: "..." }]] }   │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  GPO ile dağıtılan opencode.json                                                  │
+│  C:\ProgramData\opencode\opencode.json                                           │
+│  { plugin: [["github:securewanltd/arcode-opencode-config",                       │
+│             { manifestUrl: "..." }]] }                                         │
+└─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **GitHub manifest:** Bir organizasyon deposunda `manifest.json` tutulur. İçinde `agents`, `mcp` ve isteğe bağlı `config` tanımları yer alır.
@@ -50,7 +51,7 @@ opencode yapılandırmanıza eklentiyi tuple formunda ekleyin:
 {
   "plugin": [
     ["arcode-opencode-config", {
-      "manifestUrl": "https://raw.githubusercontent.com/ORG/REPO/main/manifest.json"
+      "manifestUrl": "https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.json"
     }]
   ]
 }
@@ -60,11 +61,17 @@ Kurumsal dağıtım için `managed-opencode.example.json` örneğini `C:\Program
 
 ## Sıfır Makine İçin Tek Komut Kurulumu (Windows)
 
-Yeni veya boş bir Windows makinesine Node.js, opencode CLI, tüm MCP ön koşulları ve plugin config'i tek adımda kurmak için `bootstrap.ps1` kullanın:
+Yeni veya boş bir Windows makinesine Node.js, opencode CLI, tüm MCP ön koşulları ve plugin config'i tek adımda kurmak için `bootstrap.ps1` kullanın. Varsayılan repo `securewanltd/arcode-opencode-config`'tir; kendi fork'unuz veya farklı bir repo için `-Repo` ile geçersiz kılabilirsiniz.
 
 ```powershell
 # Repo root'undan PowerShell'de yönetici hakları olmadan çalıştırın
-.\bootstrap.ps1 -Repo "ORG/REPO" -Branch "main"
+.\bootstrap.ps1
+```
+
+Farklı bir repo kullanmak için:
+
+```powershell
+.\bootstrap.ps1 -Repo "fork-owner/arcode-opencode-config" -Branch "main"
 ```
 
 `bootstrap.ps1` aşağıdaki adımları idempotent olarak yapar:
@@ -75,14 +82,14 @@ Yeni veya boş bir Windows makinesine Node.js, opencode CLI, tüm MCP ön koşul
    - `codegraph` CLI: Resmi installer (`irm ... | iex`) ile kurar, USER PATH'e ekler ve mevcut oturum PATH'ine prepends eder.
    - `lsp-mcp` ve `websearch-mcp`: Eksiklerse `npm install -g` ile kurar.
    - `context7` ve `grep_app`: Uzak MCP sunucuları; HEAD isteği ile erişilebilirlik bilgilendirmesi yapar, kurulum gerektirmez.
-4. **arcode-opencode-config plugin config** yazımı: `~/.config/opencode/opencode.json` içine `github:ORG/REPO` tuple girdisi ekler/günceller; diğer ayarları korur; `opencode.jsonc` varsa uyarır.
+4. **arcode-opencode-config plugin config** yazımı: `~/.config/opencode/opencode.json` içine `github:securewanltd/arcode-opencode-config` tuple girdisi ekler/günceller; diğer ayarları korur; `opencode.jsonc` varsa uyarır.
 5. **Özet tablo** ve sonraki adımlar (terminal/opencode yeniden başlatma).
 
 Parametreler:
 
 | Parametre | Varsayılan | Açıklama |
 |---|---|---|
-| `-Repo` | zorunlu | GitHub repo `owner/name` formatında. |
+| `-Repo` | `securewanltd/arcode-opencode-config` | GitHub repo `owner/name` formatında. |
 | `-Branch` | `main` | Git branch/tag/ref. |
 | `-SkipMcp` | yok | MCP ön koşul kontrol/kurulumunu atlar. |
 | `-SkipOpencode` | yok | opencode CLI kurulumunu atlar. |
@@ -91,17 +98,23 @@ Kurulum adımlarını gerçekten çalıştırmadan önce görmek için (dry-run)
 
 ```powershell
 $env:ARCODE_INSTALL_DRYRUN = '1'
-.\bootstrap.ps1 -Repo "ORG/REPO" -Branch "main"
+.\bootstrap.ps1
 ```
 
 Dry-run modunda `npm install`, `winget install` ve `codegraph` installer'ı gerçekten çalıştırılmaz; yerine `DRY RUN: would run ...` mesajları yazdırılır.
 
 ## Hafif Kurulum — Mevcut opencode/MCP Ortamı İçin (Windows)
 
-opencode ve MCP araçları zaten kuruluysa sadece plugin config'i yazmak için `install.ps1` kullanın:
+opencode ve MCP araçları zaten kuruluysa sadece plugin config'i yazmak için `install.ps1` kullanın. Varsayılan repo `securewanltd/arcode-opencode-config`'tir.
 
 ```powershell
-.\install.ps1 -Repo "ORG/REPO" -Branch "main"
+.\install.ps1
+```
+
+Farklı bir repo kullanmak için:
+
+```powershell
+.\install.ps1 -Repo "fork-owner/arcode-opencode-config" -Branch "main"
 ```
 
 `install.ps1` yalnızca plugin config yazar ve eksik MCP araçları için elle kurulum talimatı verir. Script adımları şunlardır:
@@ -110,7 +123,7 @@ opencode ve MCP araçları zaten kuruluysa sadece plugin config'i yazmak için `
 2. Mevcut `opencode.json` dosyasını okur; yoksa yeni bir tane oluşturur.
 3. Aşağıdaki gibi bir plugin girdisi ekler veya günceller:
    ```json
-   ["github:ORG/REPO", { "manifestUrl": "https://raw.githubusercontent.com/ORG/REPO/main/manifest.json" }]
+   ["github:securewanltd/arcode-opencode-config", { "manifestUrl": "https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.json" }]
    ```
 4. Diğer plugin girdilerini ve tüm üst düzey yapılandırma anahtarlarını korur.
 5. Aynı dizinde `opencode.jsonc` varsa uyarı verir ve elle birleştirilmesi gerektiğini söyler.
@@ -123,7 +136,7 @@ opencode ve MCP araçları zaten kuruluysa sadece plugin config'i yazmak için `
 MCP kurulumunu atlamak için:
 
 ```powershell
-.\install.ps1 -Repo "ORG/REPO" -Branch "main" -SkipMcp
+.\install.ps1 -SkipMcp
 ```
 
 Sonrasında:
@@ -156,7 +169,7 @@ Uzak MCP sunucuları (`grep_app`, `context7`) için ek yerel kurulum gerekmez.
 
 | Seçenek | Tür | Zorunlu | Varsayılan | Açıklama |
 |---|---|---|---|---|
-| `manifestUrl` | `string` | Evet | — | Manifest JSON dosyasının tam URL'si. Örn: `https://raw.githubusercontent.com/ORG/REPO/main/manifest.json` |
+| `manifestUrl` | `string` | Evet | — | Manifest JSON dosyasının tam URL'si. Örn: `https://raw.githubusercontent.com/securewanltd/arcode-opencode-config/main/manifest.json` |
 | `token` | `string` | Hayır | `process.env.GITHUB_TOKEN` | Private repo'lar için GitHub token. Belirtilmezse `GITHUB_TOKEN` ortam değişkenine bakılır. |
 | `timeoutMs` | `number` | Hayır | `5000` | Manifest fetch işlemi için milisaniye cinsinden zaman aşımı. |
 | `cacheDir` | `string` | Hayır | `~/.cache/arcode-opencode-config` | Son başarılı manifestin yazılacağı önbellek dizini. |
