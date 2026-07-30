@@ -14,25 +14,25 @@
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │  GitHub / GitHub Enterprise                                                     │
 │  securewanltd/arcode-opencode-config/main/manifest.json  ←  JSON Schema ile     │
-│  doğrulanır                                                                      │
-└──────────────────────────┬────────────────────────────────────────────────────────┘
+│  doğrulanır                                                                     │
+└──────────────────────────┬──────────────────────────────────────────────────────┘
                            │ fetch + Bearer token (isteğe bağlı)
                            ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│  arcode-opencode-config eklentisi                                                │
-│  - opencode.json içinde `plugin` dizisine tarball URL'si olarak tanımlı          │
-│  - Başlangıçta manifesti çeker                                                   │
-│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json kullanır        │
-│  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder                │
-└──────────────────────────┬────────────────────────────────────────────────────────┘
+│  arcode-opencode-config eklentisi                                               │
+│  - opencode.json içinde `plugin` dizisine tarball URL'si olarak tanımlı         │
+│  - Başlangıçta manifesti çeker                                                  │
+│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json kullanır      │
+│  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder               │
+└──────────────────────────┬──────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│  GPO ile dağıtılan opencode.json                                                  │
-│  C:\ProgramData\opencode\opencode.json                                           │
-│  { plugin: [["https://github.com/securewanltd/arcode-opencode-config/             │
-│             archive/refs/heads/main.tar.gz",                                     │
-│             { manifestUrl: "..." }]] }                                            │
+│  GPO ile dağıtılan opencode.json                                                │
+│  C:\ProgramData\opencode\opencode.json                                          │
+│  { plugin: [["https://github.com/securewanltd/arcode-opencode-config/           │
+│             archive/refs/heads/main.tar.gz",                                    │
+│             { manifestUrl: "..." }]] }                                          │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
