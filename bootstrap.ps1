@@ -132,6 +132,17 @@ function Invoke-NpmInstallGlobal($package) {
 function Install-NodeNpm {
     if (Test-CommandOnPath "npm") {
         Write-Step "npm already available on PATH"
+        try {
+            $nodeVersion = & node --version 2>&1
+            if ($nodeVersion -match '^v(\d+)') {
+                $major = [int]$Matches[1]
+                if ($major -lt 20) {
+                    Write-Warning "Node.js major version $major detected. @theupsider/lsp-mcp requires Node 20+; install may fail or behave unexpectedly."
+                }
+            }
+        } catch {
+            # Ignore version-check errors and continue.
+        }
         $Status.NodeNpm = "OK"
         return
     }
@@ -307,35 +318,51 @@ function Install-CodegraphCli {
     }
 }
 
-function Install-NpmMcpTool($name, $command) {
-    if ($SkipMcp) {
-        $Status[$name] = "SKIPPED"
-        return
-    }
+function Install-NpmMcpTools {
+    $tools = @(
+        @{ name = "lsp-mcp"; command = "lsp-mcp.cmd"; package = "@theupsider/lsp-mcp@1.3.2" },
+        @{ name = "websearch-mcp"; command = "websearch-mcp.cmd"; package = "websearch-mcp" }
+    )
 
-    if (Test-CommandOnPath $command) {
-        Write-Step "$command already available on PATH"
-        $Status[$name] = "OK"
+    if ($SkipMcp) {
+        foreach ($tool in $tools) { $Status[$tool.name] = "SKIPPED" }
         return
     }
 
     if (-not (Test-CommandOnPath "npm")) {
-        Write-Warning "npm not available; skipping $name installation."
-        $Status[$name] = "SKIPPED"
+        Write-Warning "npm not available; skipping MCP tool installation."
+        foreach ($tool in $tools) { $Status[$tool.name] = "SKIPPED" }
         return
     }
 
-    Write-Step "Installing $name via npm"
-    $ok = Invoke-NpmInstallGlobal $name
+    $missing = [System.Collections.ArrayList]::new()
+    foreach ($tool in $tools) {
+        if (Test-CommandOnPath $tool.command) {
+            Write-Step "$($tool.command) already available on PATH"
+            $Status[$tool.name] = "OK"
+        } else {
+            Write-Step "$($tool.name) missing; will install via npm ($($tool.package))"
+            [void]$missing.Add($tool)
+            $Status[$tool.name] = "MISSING"
+        }
+    }
+
+    if ($missing.Count -eq 0) { return }
+
+    $packageList = ($missing | ForEach-Object { $_.package }) -join " "
+    Write-Step "Installing MCP packages: $packageList"
+    $ok = Invoke-NpmInstallGlobal $packageList
     Update-ProcessPathFromRegistry
 
-    if (Test-CommandOnPath $command) {
-        $Status[$name] = "INSTALLED"
-    } else {
-        if ($ok) {
-            Write-Warning "$name install reported success but $command not found on PATH. Restart the terminal and re-run."
+    foreach ($tool in $missing) {
+        if (Test-CommandOnPath $tool.command) {
+            $Status[$tool.name] = "INSTALLED"
+        } else {
+            if ($ok) {
+                Write-Warning "$($tool.name) install reported success but $($tool.command) not found on PATH. Restart the terminal and re-run."
+            }
+            $Status[$tool.name] = "MISSING"
         }
-        $Status[$name] = "MISSING"
     }
 }
 
@@ -457,8 +484,7 @@ Install-OpencodeCli
 
 Write-Header "Stage 4/6: MCP prerequisites"
 Install-CodegraphCli
-Install-NpmMcpTool "lsp-mcp" "lsp-mcp.cmd"
-Install-NpmMcpTool "websearch-mcp" "websearch-mcp.cmd"
+Install-NpmMcpTools
 Test-RemoteMcp "https://mcp.context7.com/mcp" "Context7"
 Test-RemoteMcp "https://mcp.grep.app" "GrepApp"
 

@@ -14,25 +14,25 @@
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │  GitHub / GitHub Enterprise                                                     │
 │  securewanltd/arcode-opencode-config/main/manifest.json  ←  JSON Schema ile     │
-│  doğrulanır                                                                     │
-└──────────────────────────┬──────────────────────────────────────────────────────┘
+│  doğrulanır                                                                      │
+└──────────────────────────┬────────────────────────────────────────────────────────┘
                            │ fetch + Bearer token (isteğe bağlı)
                            ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│  arcode-opencode-config eklentisi                                               │
-│  - opencode.json içinde `plugin` dizisine tarball URL'si olarak tanımlı         │
-│  - Başlangıçta manifesti çeker                                                  │
-│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json kullanır      │
-│  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder               │
-└──────────────────────────┬──────────────────────────────────────────────────────┘
+│  arcode-opencode-config eklentisi                                                │
+│  - opencode.json içinde `plugin` dizisine tarball URL'si olarak tanımlı          │
+│  - Başlangıçta manifesti çeker                                                   │
+│  - Başarısız olursa ~/.cache/arcode-opencode-config/manifest.json kullanır        │
+│  - cfg.agent, cfg.mcp ve cfg üst düzey anahtarlarına enjekte eder                │
+└──────────────────────────┬────────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│  GPO ile dağıtılan opencode.json                                                │
-│  C:\ProgramData\opencode\opencode.json                                          │
-│  { plugin: [["https://github.com/securewanltd/arcode-opencode-config/           │
-│             archive/refs/heads/main.tar.gz",                                    │
-│             { manifestUrl: "..." }]] }                                          │
+│  GPO ile dağıtılan opencode.json                                                  │
+│  C:\ProgramData\opencode\opencode.json                                           │
+│  { plugin: [["https://github.com/securewanltd/arcode-opencode-config/             │
+│             archive/refs/heads/main.tar.gz",                                     │
+│             { manifestUrl: "..." }]] }                                            │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -80,7 +80,7 @@ Farklı bir repo kullanmak için:
 3. **opencode CLI** kontrolü/kurulumu: Eksikse `npm install -g opencode-ai` çalıştırır.
 4. **MCP ön koşulları**:
    - `codegraph` CLI: Resmi installer (`irm ... | iex`) ile kurar, USER PATH'e ekler ve mevcut oturum PATH'ine prepends eder.
-   - `lsp-mcp` ve `websearch-mcp`: Eksiklerse `npm install -g` ile kurar.
+   - `@theupsider/lsp-mcp@1.3.2` ve `websearch-mcp`: Eksiklerse `npm install -g` ile kurar. (`lsp-mcp` adındaki kapsamsız paket npm'de bir security-holding placeholder'dır; asla kullanılmamalıdır.)
    - `context7` ve `grep_app`: Uzak MCP sunucuları; HEAD isteği ile erişilebilirlik bilgilendirmesi yapar, kurulum gerektirmez.
 5. **arcode-opencode-config plugin config** yazımı: `~/.config/opencode/opencode.json` içine aşağıdaki **tarball URL** tuple girdisini ekler/günceller; eski `github:` spec ile yazılmış bir girdi varsa onu da bu tuple ile değiştirir. Diğer ayarları korur; `opencode.jsonc` varsa uyarır.
    ```json
@@ -136,7 +136,7 @@ Farklı bir repo kullanmak için:
 5. Aynı dizinde `opencode.jsonc` varsa uyarı verir ve elle birleştirilmesi gerektiğini söyler.
 6. **Otomatik MCP ön koşul kontrolü/kurulumu** yapar (`-SkipMcp` ile devre dışı bırakılabilir):
    - `npm` PATH üzerinde aranır; bulunamazsa uyarı verilir ve devam edilir.
-   - Eksik `lsp-mcp` ve `websearch-mcp` npm global paketleri otomatik kurulur.
+   - Eksik `@theupsider/lsp-mcp@1.3.2` ve `websearch-mcp` npm global paketleri otomatik kurulur. (npm'deki kapsamsız `lsp-mcp` paketi bir placeholder'dır, kullanılmamalıdır.)
    - `codegraph.cmd` PATH üzerinde aranır; bulunamazsa elle kurulması gerektiği uyarısı verilir (script tarafından otomatik kurulmaz).
    - Her araç için son durum tablosu yazdırılır.
 
@@ -159,7 +159,7 @@ Sonrasında:
 
 - **Node.js / npm**: Eksikse `winget install OpenJS.NodeJS.LTS` ile kurulur.
 - **git**: Eksikse `winget install Git.Git` ile kurulur; tarball URL kullanıldığından bu eklenti için zorunlu değildir, başarısızlık durumunda uyarı verilir ve devam edilir.
-- `lsp-mcp` / `websearch-mcp`: PATH'te aranır; eksiklerse `npm install -g` çalıştırılır.
+- `@theupsider/lsp-mcp@1.3.2` / `websearch-mcp`: PATH'te aranır; eksiklerse `npm install -g @theupsider/lsp-mcp@1.3.2 websearch-mcp` çalıştırılır. npm'deki kapsamsız `lsp-mcp` paketi bir security-holding placeholder'dır ve **asla** kullanılmamalıdır.
 - `codegraph`: Resmi PowerShell installer'ı (`irm https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex`) ile kurulur. Installer USER PATH'e ekler; script mevcut oturum PATH'ine `$env:LOCALAPPDATA\codegraph\current\bin` dizinini prepend eder.
 - `context7` / `grep_app`: Uzak MCP sunucuları; kurulum gerektirmez. Script, 5 saniyelik HEAD isteği ile erişilebilirliklerini bilgilendirme amaçlı kontrol eder.
 
@@ -167,7 +167,7 @@ Sonrasında:
 
 `install.ps1` yalnızca kontrol eder, elle kurulum için yönlendirir:
 
-- `lsp-mcp` ve `websearch-mcp`: Script, bunları PATH üzerinde arar; eksiklerse `npm install -g lsp-mcp websearch-mcp` çalıştırır.
+- `@theupsider/lsp-mcp@1.3.2` ve `websearch-mcp`: Script, bunları PATH üzerinde arar; eksiklerse `npm install -g @theupsider/lsp-mcp@1.3.2 websearch-mcp` çalıştırır. npm'deki kapsamsız `lsp-mcp` paketi bir placeholder'dır; kullanılmamalıdır.
 - `codegraph`: Script sadece `codegraph.cmd`'nin PATH üzerinde olup olmadığını kontrol eder. Eksikse elle kurmanız gerekir; kurulumdan sonra opencode'i yeniden başlatın. (codegraph resmi dağıtımını kullanın; kuruluşunuzun onaylı dağıtım yöntemini tercih edin.)
 
 Uzak MCP sunucuları (`grep_app`, `context7`) için ek yerel kurulum gerekmez.

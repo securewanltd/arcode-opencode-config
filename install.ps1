@@ -7,8 +7,10 @@
 .DESCRIPTION
     Configures opencode.json to load the arcode-opencode-config plugin from a GitHub repository tarball.
     Preserves existing config keys and other plugin entries.
-    Optionally installs the local MCP server prerequisites (lsp-mcp, websearch-mcp) via npm
+    Optionally installs the local MCP server prerequisites (@theupsider/lsp-mcp@1.3.2, websearch-mcp) via npm
     and verifies that codegraph is on PATH. Use -SkipMcp to disable MCP installation.
+
+    NOTE: The unscoped `lsp-mcp` package on npm is a security-holding placeholder and must NOT be used.
 
     The plugin is referenced by a GitHub tarball URL so that opencode can fetch it without
     requiring git to be installed on the machine (unlike the `github:owner/repo` npm spec).
@@ -169,13 +171,13 @@ if (-not $SkipMcp) {
     Write-Header "Installing MCP prerequisites"
 
     if (-not (Test-CommandOnPath "npm")) {
-        Write-Warning "Node.js/npm is not available on PATH. MCP prerequisite installation skipped. Install Node.js and re-run without -SkipMcp, or install lsp-mcp, websearch-mcp, and codegraph manually."
+        Write-Warning "Node.js/npm is not available on PATH. MCP prerequisite installation skipped. Install Node.js and re-run without -SkipMcp, or install @theupsider/lsp-mcp@1.3.2, websearch-mcp, and codegraph manually. NOTE: the bare 'lsp-mcp' package on npm is a placeholder and must not be used."
     } else {
         Write-Step "npm found on PATH"
 
         $npmTools = @(
-            @{ name = "lsp-mcp"; command = "lsp-mcp.cmd" },
-            @{ name = "websearch-mcp"; command = "websearch-mcp.cmd" }
+            @{ name = "lsp-mcp"; command = "lsp-mcp.cmd"; package = "@theupsider/lsp-mcp@1.3.2" },
+            @{ name = "websearch-mcp"; command = "websearch-mcp.cmd"; package = "websearch-mcp" }
         )
         $missing = [System.Collections.ArrayList]::new()
 
@@ -184,14 +186,14 @@ if (-not $SkipMcp) {
                 Write-Step "$($tool.name) already available ($($tool.command))"
                 $McpStatus[$tool.name] = "OK"
             } else {
-                Write-Step "$($tool.name) missing; will install via npm"
-                [void]$missing.Add($tool.name)
+                Write-Step "$($tool.name) missing; will install via npm ($($tool.package))"
+                [void]$missing.Add($tool)
                 $McpStatus[$tool.name] = "MISSING"
             }
         }
 
         if ($missing.Count -gt 0) {
-            $packageList = $missing -join " "
+            $packageList = ($missing | ForEach-Object { $_.package }) -join " "
             Write-Step "Installing: $packageList"
             $installOk = Invoke-NpmInstallGlobal $packageList
             if (-not $installOk) {
@@ -239,11 +241,14 @@ Write-Host @"
 1. Restart opencode so the arcode-opencode-config plugin is downloaded from the tarball and fetches the manifest from:
    $ManifestUrl
 
-2. If codegraph.cmd is missing from PATH, install the codegraph CLI from the official distribution, ensure it is on PATH, and restart opencode.
+2. If lsp-mcp.cmd is missing from PATH, install the correct scoped package (do NOT use the bare `lsp-mcp` placeholder):
+   npm install -g @theupsider/lsp-mcp@1.3.2
 
-3. If you already have an opencode.jsonc file, review it and merge any settings into opencode.json.
+3. If codegraph.cmd is missing from PATH, install the codegraph CLI from the official distribution, ensure it is on PATH, and restart opencode.
 
-4. Edit manifest.json on GitHub; the next opencode start on every machine will pull the updated agents, MCP servers, and config keys.
+4. If you already have an opencode.jsonc file, review it and merge any settings into opencode.json.
+
+5. Edit manifest.json on GitHub; the next opencode start on every machine will pull the updated agents, MCP servers, and config keys.
 "@
 
 Write-Header "Resulting opencode.json"
