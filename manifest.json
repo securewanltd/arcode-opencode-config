@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "opencode/deepseek-v4-flash-free",
+      "model": "deepseek/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
