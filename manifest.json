@@ -164,7 +164,7 @@
     "explorer": {
       "description": "Kod tabanında hızlı keşif, sembol konumu, çağıranlar",
       "mode": "all",
-      "model": "opencode/north-mini-code-free",
+      "model": "deepseek/deepseek-v4-pro",
       "permission": {
         "read": "allow",
         "glob": "allow",
