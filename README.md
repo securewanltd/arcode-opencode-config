@@ -79,7 +79,7 @@ Farklı bir repo kullanmak için:
 2. **git** kontrolü: Eksikse ve `winget` varsa `winget install Git.Git` ile kurar. Eklentinin kendisi tarball URL'si kullandığı için git şart değildir, ancak diğer `github:` spec ile yüklenen plugin'ler için git gerekebilir; bu yüzden kurulum denenir, başarısızlık durumunda sadece uyarı verilir ve script devam eder.
 3. **opencode CLI** kontrolü/kurulumu: Eksikse `npm install -g opencode-ai` çalıştırır.
 4. **MCP ön koşulları**:
-   - `codegraph` CLI: Resmi installer (`irm ... | iex`) ile kurar, USER PATH'e ekler ve mevcut oturum PATH'ine prepends eder.
+   - `codegraph` CLI: Eksikse `npm install -g @colbymchenry/codegraph@1.5.0` ile kurar. (Node.js olmayan makineler için resmi standalone installer alternatif olarak kullanılabilir.)
    - `@theupsider/lsp-mcp@1.3.2` ve `websearch-mcp`: Eksiklerse `npm install -g` ile kurar. (`lsp-mcp` adındaki kapsamsız paket npm'de bir security-holding placeholder'dır; asla kullanılmamalıdır.)
    - `context7` ve `grep_app`: Uzak MCP sunucuları; HEAD isteği ile erişilebilirlik bilgilendirmesi yapar, kurulum gerektirmez.
 5. **arcode-opencode-config plugin config** yazımı: `~/.config/opencode/opencode.json` içine aşağıdaki **tarball URL** tuple girdisini ekler/günceller; eski `github:` spec ile yazılmış bir girdi varsa onu da bu tuple ile değiştirir. Diğer ayarları korur; `opencode.jsonc` varsa uyarır.
@@ -107,7 +107,7 @@ $env:ARCODE_INSTALL_DRYRUN = '1'
 .\bootstrap.ps1
 ```
 
-Dry-run modunda `npm install`, `winget install` ve `codegraph` installer'ı gerçekten çalıştırılmaz; yerine `DRY RUN: would run ...` mesajları yazdırılır.
+Dry-run modunda `npm install` ve `winget install` gerçekten çalıştırılmaz; yerine `DRY RUN: would run ...` mesajları yazdırılır.
 
 ## Hafif Kurulum — Mevcut opencode/MCP Ortamı İçin (Windows)
 
@@ -136,8 +136,7 @@ Farklı bir repo kullanmak için:
 5. Aynı dizinde `opencode.jsonc` varsa uyarı verir ve elle birleştirilmesi gerektiğini söyler.
 6. **Otomatik MCP ön koşul kontrolü/kurulumu** yapar (`-SkipMcp` ile devre dışı bırakılabilir):
    - `npm` PATH üzerinde aranır; bulunamazsa uyarı verilir ve devam edilir.
-   - Eksik `@theupsider/lsp-mcp@1.3.2` ve `websearch-mcp` npm global paketleri otomatik kurulur. (npm'deki kapsamsız `lsp-mcp` paketi bir placeholder'dır, kullanılmamalıdır.)
-   - `codegraph.cmd` PATH üzerinde aranır; bulunamazsa elle kurulması gerektiği uyarısı verilir (script tarafından otomatik kurulmaz).
+   - Eksik `@theupsider/lsp-mcp@1.3.2`, `websearch-mcp` ve `@colbymchenry/codegraph@1.5.0` npm global paketleri otomatik kurulur. (npm'deki kapsamsız `lsp-mcp` paketi bir placeholder'dır, kullanılmamalıdır.)
    - Her araç için son durum tablosu yazdırılır.
 
 MCP kurulumunu atlamak için:
@@ -160,21 +159,21 @@ Sonrasında:
 - **Node.js / npm**: Eksikse `winget install OpenJS.NodeJS.LTS` ile kurulur.
 - **git**: Eksikse `winget install Git.Git` ile kurulur; tarball URL kullanıldığından bu eklenti için zorunlu değildir, başarısızlık durumunda uyarı verilir ve devam edilir.
 - `@theupsider/lsp-mcp@1.3.2` / `websearch-mcp`: PATH'te aranır; eksiklerse `npm install -g @theupsider/lsp-mcp@1.3.2 websearch-mcp` çalıştırılır. npm'deki kapsamsız `lsp-mcp` paketi bir security-holding placeholder'dır ve **asla** kullanılmamalıdır.
-- `codegraph`: Resmi PowerShell installer'ı (`irm https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex`) ile kurulur. Installer USER PATH'e ekler; script mevcut oturum PATH'ine `$env:LOCALAPPDATA\codegraph\current\bin` dizinini prepend eder.
+- `codegraph`: Eksikse `npm install -g @colbymchenry/codegraph@1.5.0` ile kurulur. Node.js olmayan makineler için resmi standalone installer alternatif olarak kullanılabilir.
 - `context7` / `grep_app`: Uzak MCP sunucuları; kurulum gerektirmez. Script, 5 saniyelik HEAD isteği ile erişilebilirliklerini bilgilendirme amaçlı kontrol eder.
 
 ### `install.ps1` (hafif kurulum — mevcut ortam)
 
-`install.ps1` yalnızca kontrol eder, elle kurulum için yönlendirir:
+`install.ps1` yalnızca plugin config yazar ve eksik MCP araçları için npm kurulumu yapar (`-SkipMcp` ile atlanabilir).
 
 - `@theupsider/lsp-mcp@1.3.2` ve `websearch-mcp`: Script, bunları PATH üzerinde arar; eksiklerse `npm install -g @theupsider/lsp-mcp@1.3.2 websearch-mcp` çalıştırır. npm'deki kapsamsız `lsp-mcp` paketi bir placeholder'dır; kullanılmamalıdır.
-- `codegraph`: Script sadece `codegraph.cmd`'nin PATH üzerinde olup olmadığını kontrol eder. Eksikse elle kurmanız gerekir; kurulumdan sonra opencode'i yeniden başlatın. (codegraph resmi dağıtımını kullanın; kuruluşunuzun onaylı dağıtım yöntemini tercih edin.)
+- `codegraph`: Script, `codegraph.cmd`'yi PATH üzerinde arar; eksikse `npm install -g @colbymchenry/codegraph@1.5.0` çalıştırır. Node.js olmayan makineler için resmi standalone installer alternatif olarak kullanılabilir.
 
 Uzak MCP sunucuları (`grep_app`, `context7`) için ek yerel kurulum gerekmez.
 
 > **Bilinen sorun: eski `lsp-mcp` placeholder paketi.** Daha önce bare `lsp-mcp` (npm'deki security-holding placeholder) kurulduysa, aynı bin adını (`lsp-mcp`) kullandığı için `@theupsider/lsp-mcp@1.3.2` kurulumu `EEXIST` ile çökebilir. Her iki script de kurulum öncesinde otomatik olarak: (1) çalışan `opencode.exe`/`node.exe` süreçlerini tespit edip MCP kurulumunu atlar (`Kurulumdan önce opencode'u kapatın`), (2) global `lsp-mcp` placeholder paketini, eski shim'leri ve `node_modules\lsp-mcp` dizinini temizler. opencode çalışırken MCP kurulumu yapmayın; dosya kilitleri `EPERM` hatasına yol açar.
 
-> **Not:** Otomatik kurulumları gerçekten çalıştırmadan önce görmek için hem `bootstrap.ps1` hem de `install.ps1` ile `ARCODE_INSTALL_DRYRUN=1` ortam değişkeni kullanılabilir. Bu modda `npm install`, `winget install` ve `codegraph` installer'ı gerçekten çalıştırılmaz, yerine "DRY RUN: would run ..." mesajları yazdırılır.
+> **Not:** Otomatik kurulumları gerçekten çalıştırmadan önce görmek için hem `bootstrap.ps1` hem de `install.ps1` ile `ARCODE_INSTALL_DRYRUN=1` ortam değişkeni kullanılabilir. Bu modda `npm install` ve `winget install` gerçekten çalıştırılmaz, yerine "DRY RUN: would run ..." mesajları yazdırılır.
 
 ## Eklenti Seçenekleri
 

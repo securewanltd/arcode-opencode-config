@@ -7,8 +7,8 @@
 .DESCRIPTION
     Configures opencode.json to load the arcode-opencode-config plugin from a GitHub repository tarball.
     Preserves existing config keys and other plugin entries.
-    Optionally installs the local MCP server prerequisites (@theupsider/lsp-mcp@1.3.2, websearch-mcp) via npm
-    and verifies that codegraph is on PATH. Use -SkipMcp to disable MCP installation.
+    Optionally installs the local MCP server prerequisites (@theupsider/lsp-mcp@1.3.2, websearch-mcp,
+    @colbymchenry/codegraph@1.5.0) via npm. Use -SkipMcp to disable MCP installation.
 
     NOTE: The unscoped `lsp-mcp` package on npm is a security-holding placeholder and must NOT be used.
 
@@ -279,11 +279,12 @@ if (-not $SkipMcp) {
     Write-Header "Installing MCP prerequisites"
 
     if (-not (Test-CommandOnPath "npm")) {
-        Write-Warning "Node.js/npm is not available on PATH. MCP prerequisite installation skipped. Install Node.js and re-run without -SkipMcp, or install @theupsider/lsp-mcp@1.3.2, websearch-mcp, and codegraph manually. NOTE: the bare 'lsp-mcp' package on npm is a placeholder and must not be used."
+        Write-Warning "Node.js/npm is not available on PATH. MCP prerequisite installation skipped. Install Node.js and re-run without -SkipMcp, or install @theupsider/lsp-mcp@1.3.2, websearch-mcp, and @colbymchenry/codegraph@1.5.0 manually. NOTE: the bare 'lsp-mcp' package on npm is a placeholder and must not be used."
     } else {
         Write-Step "npm found on PATH"
 
         $npmTools = @(
+            @{ name = "codegraph"; command = "codegraph.cmd"; package = "@colbymchenry/codegraph@1.5.0" },
             @{ name = "lsp-mcp"; command = "lsp-mcp.cmd"; package = "@theupsider/lsp-mcp@1.3.2" },
             @{ name = "websearch-mcp"; command = "websearch-mcp.cmd"; package = "websearch-mcp" }
         )
@@ -331,14 +332,6 @@ if (-not $SkipMcp) {
                 }
             }
         }
-
-        if (Test-CommandOnPath "codegraph.cmd") {
-            Write-Step "codegraph CLI found on PATH"
-            $McpStatus["codegraph"] = "OK"
-        } else {
-            Write-Warning "codegraph CLI not found on PATH. codegraph is required by the manifest MCP server. Install codegraph from the official distribution, ensure codegraph.cmd is on PATH, and restart opencode."
-            $McpStatus["codegraph"] = "MISSING"
-        }
     }
 
     Write-Header "MCP prerequisite summary"
@@ -364,7 +357,8 @@ Write-Host @"
 2. If lsp-mcp.cmd is missing from PATH, install the correct scoped package (do NOT use the bare `lsp-mcp` placeholder):
    npm install -g @theupsider/lsp-mcp@1.3.2
 
-3. If codegraph.cmd is missing from PATH, install the codegraph CLI from the official distribution, ensure it is on PATH, and restart opencode.
+3. If codegraph.cmd is missing from PATH, install the pinned npm package:
+   npm install -g @colbymchenry/codegraph@1.5.0
 
 4. If you already have an opencode.jsonc file, review it and merge any settings into opencode.json.
 

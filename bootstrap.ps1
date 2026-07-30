@@ -9,7 +9,7 @@
     - Checks/Installs Node.js/npm via winget (if available)
     - Checks/Installs git via winget (if available) for general plugin compatibility
     - Checks/Installs opencode CLI
-    - Checks/Installs MCP prerequisites (codegraph, lsp-mcp, websearch-mcp)
+    - Checks/Installs MCP prerequisites via npm: @theupsider/lsp-mcp@1.3.2, websearch-mcp, and @colbymchenry/codegraph@1.5.0
     - Verifies remote MCP endpoints (context7, grep_app) reachability
     - Configures opencode.json with the arcode-opencode-config plugin tuple
 
@@ -53,7 +53,7 @@ $Status = @{
     NodeNpm = $null
     Git = $null
     Opencode = $null
-    Codegraph = $null
+    codegraph = $null
     "lsp-mcp" = $null
     "websearch-mcp" = $null
     Context7 = $null
@@ -274,50 +274,6 @@ function Install-OpencodeCli {
 
 # --- Stage 4: MCP prerequisites ---
 
-function Install-CodegraphCli {
-    if ($SkipMcp) {
-        $Status.Codegraph = "SKIPPED"
-        return
-    }
-
-    $binDir = Join-Path $env:LOCALAPPDATA "codegraph\current\bin"
-
-    if (Test-CommandOnPath "codegraph.cmd") {
-        Write-Step "codegraph.cmd already available on PATH"
-        $Status.Codegraph = "OK"
-        return
-    }
-
-    Write-Step "codegraph.cmd not found on PATH; installing via official installer"
-    if ($env:ARCODE_INSTALL_DRYRUN -eq '1') {
-        Write-Step "DRY RUN: would run irm https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex"
-        $Status.Codegraph = "SKIPPED"
-        return
-    }
-
-    try {
-        $installerUrl = "https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1"
-        $installScript = Invoke-RestMethod -Uri $installerUrl -ErrorAction Stop
-        Invoke-Expression $installScript
-
-        # Installer updates USER PATH; refresh process PATH and prepend known bin dir for this session.
-        Update-ProcessPathFromRegistry
-        if (Test-Path -LiteralPath $binDir) {
-            $env:Path = "$binDir;$env:Path"
-        }
-
-        if (Test-CommandOnPath "codegraph.cmd") {
-            $Status.Codegraph = "INSTALLED"
-        } else {
-            Write-Warning "codegraph installed but codegraph.cmd not on PATH. Restart the terminal and re-run."
-            $Status.Codegraph = "MISSING"
-        }
-    } catch {
-        Write-Warning "codegraph installation failed: $_"
-        $Status.Codegraph = "MISSING"
-    }
-}
-
 function Get-RunningOpencodeOrLspMcpProcesses {
     try {
         return Get-CimInstance Win32_Process | Where-Object {
@@ -411,6 +367,7 @@ function Test-LspMcpShimIsHealthy($command) {
 
 function Install-NpmMcpTools {
     $tools = @(
+        @{ name = "codegraph"; command = "codegraph.cmd"; package = "@colbymchenry/codegraph@1.5.0" },
         @{ name = "lsp-mcp"; command = "lsp-mcp.cmd"; package = "@theupsider/lsp-mcp@1.3.2" },
         @{ name = "websearch-mcp"; command = "websearch-mcp.cmd"; package = "websearch-mcp" }
     )
@@ -594,7 +551,6 @@ Write-Header "Stage 3/6: opencode CLI"
 Install-OpencodeCli
 
 Write-Header "Stage 4/6: MCP prerequisites"
-Install-CodegraphCli
 Install-NpmMcpTools
 Test-RemoteMcp "https://mcp.context7.com/mcp" "Context7"
 Test-RemoteMcp "https://mcp.grep.app" "GrepApp"
@@ -606,7 +562,7 @@ Write-Header "Stage 6/6: Summary"
 Write-Status "Node.js / npm" $Status.NodeNpm
 Write-Status "git" $Status.Git
 Write-Status "opencode CLI" $Status.Opencode
-Write-Status "codegraph" $Status.Codegraph
+Write-Status "codegraph" $Status["codegraph"]
 Write-Status "lsp-mcp" $Status["lsp-mcp"]
 Write-Status "websearch-mcp" $Status["websearch-mcp"]
 Write-Status "context7 (remote)" $Status.Context7
