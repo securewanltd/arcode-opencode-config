@@ -318,6 +318,97 @@ function Install-CodegraphCli {
     }
 }
 
+function Get-RunningOpencodeOrLspMcpProcesses {
+    try {
+        return Get-CimInstance Win32_Process | Where-Object {
+            ($_.Name -in @('opencode.exe', 'node.exe')) -and
+            ($_.CommandLine -match 'opencode|lsp-mcp')
+        }
+    } catch {
+        Write-Warning "Could not enumerate running processes: $_"
+        return @()
+    }
+}
+
+function Remove-StaleLspMcpPlaceholder {
+    if ($env:ARCODE_INSTALL_DRYRUN -eq '1') {
+        Write-Step "DRY RUN: would check for and remove stale bare `lsp-mcp` placeholder package/shims"
+        return
+    }
+
+    # 1. Remove the placeholder package from npm's global list if present.
+    try {
+        $npmLsJson = & npm ls -g --depth=0 --json 2>&1 | Out-String
+        $npmLs = $npmLsJson | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($npmLs -and $npmLs.dependencies -and $npmLs.dependencies.'lsp-mcp') {
+            Write-Step "Found stale bare `lsp-mcp` package in global npm list; uninstalling"
+            $uninstallOut = & npm uninstall -g lsp-mcp 2>&1
+            $uninstallExit = $LASTEXITCODE
+            if ($uninstallExit -ne 0) {
+                Write-Warning "npm uninstall -g lsp-mcp returned exit code $uninstallExit; continuing with shim cleanup"
+            } else {
+                Write-Step "npm uninstall -g lsp-mcp succeeded"
+            }
+        }
+    } catch {
+        Write-Warning "Could not check global npm list for stale lsp-mcp: $_"
+    }
+
+    # 2. Remove stale placeholder shims that point to node_modules\lsp-mcp but not @theupsider\lsp-mcp.
+    $shimDir = Join-Path $env:APPDATA 'npm'
+    foreach ($shimName in @('lsp-mcp', 'lsp-mcp.cmd', 'lsp-mcp.ps1')) {
+        $shimPath = Join-Path $shimDir $shimName
+        if (Test-Path -LiteralPath $shimPath) {
+            try {
+                $content = Get-Content -LiteralPath $shimPath -Raw -ErrorAction Stop
+                if ($content -match 'node_modules\\lsp-mcp' -and $content -notmatch '@theupsider\\lsp-mcp') {
+                    Write-Step "Deleting stale placeholder shim $shimPath"
+                    Remove-Item -LiteralPath $shimPath -Force
+                } else {
+                    Write-Step "Shim $shimName references @theupsider/lsp-mcp or is not a placeholder; keeping"
+                }
+            } catch {
+                Write-Warning "Could not inspect shim $shimPath : $_"
+            }
+        }
+    }
+
+    # 3. Remove a leftover bare package directory in %APPDATA%\npm\node_modules\lsp-mcp.
+    $placeholderDir = Join-Path $shimDir 'node_modules\lsp-mcp'
+    if (Test-Path -LiteralPath $placeholderDir) {
+        $pkgJsonPath = Join-Path $placeholderDir 'package.json'
+        $isScoped = $false
+        if (Test-Path -LiteralPath $pkgJsonPath) {
+            try {
+                $pkgJson = Get-Content -LiteralPath $pkgJsonPath -Raw | ConvertFrom-Json -ErrorAction Stop
+                if ($pkgJson.name -eq '@theupsider/lsp-mcp') {
+                    $isScoped = $true
+                }
+            } catch {
+                # Treat unreadable package.json as stale.
+            }
+        }
+        if (-not $isScoped) {
+            Write-Step "Removing stale placeholder directory $placeholderDir"
+            Remove-Item -LiteralPath $placeholderDir -Recurse -Force
+        } else {
+            Write-Step "node_modules\lsp-mcp is @theupsider/lsp-mcp; keeping"
+        }
+    }
+}
+
+function Test-LspMcpShimIsHealthy($command) {
+    try {
+        $cmdInfo = Get-Command $command -ErrorAction Stop
+        $shimPath = $cmdInfo.Source
+        if (-not (Test-Path -LiteralPath $shimPath)) { return $false }
+        $content = Get-Content -LiteralPath $shimPath -Raw -ErrorAction Stop
+        return $content -match '@theupsider\\lsp-mcp'
+    } catch {
+        return $false
+    }
+}
+
 function Install-NpmMcpTools {
     $tools = @(
         @{ name = "lsp-mcp"; command = "lsp-mcp.cmd"; package = "@theupsider/lsp-mcp@1.3.2" },
@@ -334,6 +425,21 @@ function Install-NpmMcpTools {
         foreach ($tool in $tools) { $Status[$tool.name] = "SKIPPED" }
         return
     }
+
+    # Guard: do not install while opencode or lsp-mcp processes are running (EPERM file locks).
+    $running = Get-RunningOpencodeOrLspMcpProcesses
+    if ($running.Count -gt 0) {
+        Write-Warning "Kurulumdan önce opencode'u kapatın: running opencode/lsp-mcp processes detected."
+        foreach ($proc in $running) {
+            Write-Warning "  ProcessId: $($proc.ProcessId), Name: $($proc.Name)"
+        }
+        Write-Warning "MCP install skipped to avoid EPERM file locks. Close opencode and re-run."
+        foreach ($tool in $tools) { $Status[$tool.name] = "SKIPPED (opencode running)" }
+        return
+    }
+
+    # Guard: remove stale bare lsp-mcp placeholder before installing the scoped package.
+    Remove-StaleLspMcpPlaceholder
 
     $missing = [System.Collections.ArrayList]::new()
     foreach ($tool in $tools) {
@@ -356,7 +462,12 @@ function Install-NpmMcpTools {
 
     foreach ($tool in $missing) {
         if (Test-CommandOnPath $tool.command) {
-            $Status[$tool.name] = "INSTALLED"
+            if ($tool.name -eq 'lsp-mcp' -and -not (Test-LspMcpShimIsHealthy $tool.command)) {
+                Write-Warning "lsp-mcp.cmd found on PATH but its shim does not reference @theupsider/lsp-mcp; a stale placeholder may still be present."
+                $Status[$tool.name] = "MISSING"
+            } else {
+                $Status[$tool.name] = "INSTALLED"
+            }
         } else {
             if ($ok) {
                 Write-Warning "$($tool.name) install reported success but $($tool.command) not found on PATH. Restart the terminal and re-run."

@@ -172,6 +172,8 @@ Sonrasında:
 
 Uzak MCP sunucuları (`grep_app`, `context7`) için ek yerel kurulum gerekmez.
 
+> **Bilinen sorun: eski `lsp-mcp` placeholder paketi.** Daha önce bare `lsp-mcp` (npm'deki security-holding placeholder) kurulduysa, aynı bin adını (`lsp-mcp`) kullandığı için `@theupsider/lsp-mcp@1.3.2` kurulumu `EEXIST` ile çökebilir. Her iki script de kurulum öncesinde otomatik olarak: (1) çalışan `opencode.exe`/`node.exe` süreçlerini tespit edip MCP kurulumunu atlar (`Kurulumdan önce opencode'u kapatın`), (2) global `lsp-mcp` placeholder paketini, eski shim'leri ve `node_modules\lsp-mcp` dizinini temizler. opencode çalışırken MCP kurulumu yapmayın; dosya kilitleri `EPERM` hatasına yol açar.
+
 > **Not:** Otomatik kurulumları gerçekten çalıştırmadan önce görmek için hem `bootstrap.ps1` hem de `install.ps1` ile `ARCODE_INSTALL_DRYRUN=1` ortam değişkeni kullanılabilir. Bu modda `npm install`, `winget install` ve `codegraph` installer'ı gerçekten çalıştırılmaz, yerine "DRY RUN: would run ..." mesajları yazdırılır.
 
 ## Eklenti Seçenekleri
