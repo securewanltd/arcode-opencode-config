@@ -1,0 +1,1 @@
+{"version":1,"config":{"default_agent":"reviewer","model":"openai/gpt-5","small_model":"openai/gpt-5.4-mini","not_allowed":"should be skipped","also_bad":123},"agents":{},"mcp":{}}

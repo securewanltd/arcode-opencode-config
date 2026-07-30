@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    [
+      "arcode-opencode-config",
+      {
+        "manifestUrl": "https://raw.githubusercontent.com/ORG/REPO/main/manifest.json"
+      }
+    ]
+  ]
+}
