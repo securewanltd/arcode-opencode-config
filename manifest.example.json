@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "config": {
+    "default_agent": "reviewer"
+  },
+  "agents": {
+    "reviewer": {
+      "description": "Kod incelemesi yapan dikkatli bir alt-agent",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "prompt": "Sen deneyimli bir kod gözden geçiricisisin. Görevin: verilen kodu okumak, hata, güvenlik açığı ve stil sorunlarını tespit etmek, somut öneriler sunmak. Dosya düzenleme yetkin yok; sadece yorum ve öneri üretirsin.",
+      "temperature": 0.2,
+      "permission": {
+        "edit": "deny"
+      }
+    },
+    "docs": {
+      "description": "Dokümantasyon ve README yazımına yardımcı olan agent",
+      "mode": "all",
+      "model": "openai/gpt-4.1",
+      "prompt": "Sen teknik dokümantasyon uzmanısın. README, API dokümanı ve kullanım kılavuzları yazar, mevcut dokümanları güncellersin ve açık, tutarlı bir dil kullanırsın.",
+      "temperature": 0.4
+    }
+  },
+  "mcp": {
+    "github-remote": {
+      "type": "remote",
+      "url": "https://api.github.com/mcp",
+      "headers": {
+        "Accept": "application/vnd.github+json"
+      },
+      "enabled": true
+    },
+    "filesystem-local": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "C:\\Projects"],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "enabled": true
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/ORG/REPO/main/manifest.schema.json",
+  "title": "arcode-opencode-config manifest",
+  "description": "Configuration manifest consumed by the arcode-opencode-config opencode plugin",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "Manifest schema version. Must be 1 for this revision.",
+      "minimum": 1,
+      "maximum": 1
+    },
+    "config": {
+      "type": "object",
+      "description": "Optional top-level opencode config keys to merge into cfg",
+      "properties": {
+        "default_agent": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "small_model": {
+          "type": "string"
+        },
+        "share": {
+          "type": "boolean"
+        },
+        "autoupdate": {
+          "type": "boolean"
+        },
+        "instructions": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "agents": {
+      "type": "object",
+      "description": "Map of agent names to agent definitions",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["primary", "subagent", "all"]
+          },
+          "model": {
+            "type": "string",
+            "description": "Model identifier in provider/model-id format"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "System prompt / character for the agent"
+          },
+          "temperature": {
+            "type": "number"
+          },
+          "permission": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "mcp": {
+      "type": "object",
+      "description": "Map of MCP server names to MCP server definitions",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["local", "remote"]
+          },
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "url": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "environment": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "object",
+            "description": "Environment variables for the MCP server (opencode.jsonc compatible alias of environment)",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}
