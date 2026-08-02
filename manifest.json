@@ -7,7 +7,7 @@
     "advisor": {
       "description": "Zor mimari, hata ayıklama, güvenlik ve performans kararları için danışman",
       "mode": "all",
-      "model": "openai/gpt-5.6-terra",
+      "model": "9router/cx/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -28,7 +28,7 @@
     "architect": {
       "description": "Yeni özellik, sistem tasarımı, teknoloji seçimi",
       "mode": "all",
-      "model": "openai/gpt-5.6-terra",
+      "model": "9router/cx/gpt-5.6-terra",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -49,7 +49,7 @@
     "Peganet - Big Boss": {
       "description": "Pure orchestration controller that analyzes requests, selects specialist subagents, coordinates parallel work, and verifies their results without implementing changes itself. Use as the default agent for all development work. Routes complex pentest work to deep-pentester and standard pentest work to pentester.",
       "mode": "primary",
-      "model": "openai/gpt-5.6-sol",
+      "model": "9router/cx/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -73,7 +73,7 @@
     "bug-hunter": {
       "description": "Hata, çökme, başarısız test, beklenmeyen davranış",
       "mode": "all",
-      "model": "openai/gpt-5.6-sol",
+      "model": "9router/cx/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -94,7 +94,7 @@
     "code-reviewer": {
       "description": "PR/diff inceleme, kod kalitesi kontrolü",
       "mode": "all",
-      "model": "kimi-for-coding/kimi-for-coding",
+      "model": "9router/kimi/kimi-for-coding",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "deepseek/deepseek-v4-flash",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -143,7 +143,7 @@
     "executor": {
       "description": "Kod yazma, düzenleme, özellik uygulama, test ve migration icrası",
       "mode": "all",
-      "model": "kimi-for-coding/kimi-for-coding",
+      "model": "9router/kimi/kimi-for-coding",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -164,7 +164,7 @@
     "explorer": {
       "description": "Kod tabanında hızlı keşif, sembol konumu, çağıranlar",
       "mode": "all",
-      "model": "deepseek/deepseek-v4-pro",
+      "model": "9router/ds/deepseek-v4-pro",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -185,7 +185,7 @@
     "media-analyst": {
       "description": "PDF, görsel, diyagram analizi ve bilgi çıkarımı",
       "mode": "all",
-      "model": "openai/gpt-5.4-mini",
+      "model": "9router/cx/gpt-5.4-mini",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -206,7 +206,7 @@
     "pentester": {
       "description": "Güvenlik denetimi, threat modeling, zafiyet araştırması",
       "mode": "all",
-      "model": "openai/gpt-5.6-sol",
+      "model": "9router/cx/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -227,7 +227,7 @@
     "deep-pentester": {
       "description": "Derin ve karmaşık pentest operasyonları, red team, exploit geliştirme, ileri AD/cloud/web güvenliği ve kurumsal pentest raporlaması",
       "mode": "all",
-      "model": "openai/gpt-5.6-sol",
+      "model": "9router/cx/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -269,7 +269,7 @@
     "refactoring-specialist": {
       "description": "Temizlik, sadeleştirme, modernizasyon",
       "mode": "all",
-      "model": "kimi-for-coding/kimi-for-coding",
+      "model": "9router/kimi/kimi-for-coding",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -309,7 +309,7 @@
       "prompt": "# Researcher\n\nYou are an external-knowledge researcher. You find official documentation, remote repository code, and open-source usage examples, and report them with sources.\n\n## When active\n\n- Looking up a library, framework, or API's official docs or current syntax.\n- Finding real-world usage examples in open-source repositories.\n- Comparing approaches across external sources.\n\n## Rules\n\n- Read-only for the local project. Never modify project files.\n- Cite every claim with its source URL or repository path.\n- Prefer official documentation over blogs; flag version mismatches.\n- Distinguish verified facts from assumptions.\n"
     },
     "general": {
-      "model": "openai/gpt-5.6-terra"
+      "model": "9router/cx/gpt-5.6-terra"
     }
   },
   "mcp": {
