@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "subagent_depth": 2,
+  "subagent_depth": 1,
   "plugin": [
     [
       "https://github.com/securewanltd/arcode-opencode-config/archive/refs/heads/main.tar.gz",
