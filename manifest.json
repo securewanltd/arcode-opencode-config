@@ -94,7 +94,7 @@
     "code-reviewer": {
       "description": "PR/diff inceleme, kod kalitesi kontrolü",
       "mode": "all",
-      "model": "9router/kimi/kimi-for-coding",
+      "model": "9router/cx/gpt-5.6-luna",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -143,7 +143,7 @@
     "executor": {
       "description": "Kod yazma, düzenleme, özellik uygulama, test ve migration icrası",
       "mode": "all",
-      "model": "9router/kimi/kimi-for-coding",
+      "model": "9router/cx/gpt-5.6-luna",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -269,7 +269,7 @@
     "refactoring-specialist": {
       "description": "Temizlik, sadeleştirme, modernizasyon",
       "mode": "all",
-      "model": "9router/kimi/kimi-for-coding",
+      "model": "9router/cx/gpt-5.6-luna",
       "permission": {
         "read": "allow",
         "glob": "allow",
