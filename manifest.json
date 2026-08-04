@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "9router/ds/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash-free",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -143,7 +143,7 @@
     "executor": {
       "description": "Kod yazma, düzenleme, özellik uygulama, test ve migration icrası",
       "mode": "all",
-      "model": "9router/cx/gpt-5.6-luna",
+      "model": "9router/kimi/kimi-for-coding",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -248,7 +248,7 @@
     "planner": {
       "description": "İş planı çıkarma, görev bölümleme, plan kritiği",
       "mode": "all",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "9router/kimi/k3",
       "permission": {
         "read": "allow",
         "glob": "allow",
