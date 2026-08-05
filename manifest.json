@@ -73,7 +73,7 @@
     "bug-hunter": {
       "description": "Hata, çökme, başarısız test, beklenmeyen davranış",
       "mode": "all",
-      "model": "9router/kimi/kimi-for-coding",
+      "model": "opencode/deepseek-v4-flash-free",
       "permission": {
         "read": "allow",
         "glob": "allow",
