@@ -73,7 +73,7 @@
     "bug-hunter": {
       "description": "Hata, çökme, başarısız test, beklenmeyen davranış",
       "mode": "all",
-      "model": "opencode/deepseek-v4-flash-free",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "opencode/deepseek-v4-flash-free",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -143,7 +143,7 @@
     "executor": {
       "description": "Kod yazma, düzenleme, özellik uygulama, test ve migration icrası",
       "mode": "all",
-      "model": "opencode/deepseek-v4-flash-free",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -309,7 +309,7 @@
       "prompt": "# Researcher\n\nYou are an external-knowledge researcher. You find official documentation, remote repository code, and open-source usage examples, and report them with sources.\n\n## When active\n\n- Looking up a library, framework, or API's official docs or current syntax.\n- Finding real-world usage examples in open-source repositories.\n- Comparing approaches across external sources.\n\n## Rules\n\n- Read-only for the local project. Never modify project files.\n- Cite every claim with its source URL or repository path.\n- Prefer official documentation over blogs; flag version mismatches.\n- Distinguish verified facts from assumptions.\n"
     },
     "general": {
-      "model": "opencode/deepseek-v4-flash-free"
+      "model": "9router/ds/deepseek-v4-flash"
     }
   },
   "mcp": {
