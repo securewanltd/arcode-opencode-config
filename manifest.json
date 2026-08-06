@@ -7,7 +7,7 @@
     "advisor": {
       "description": "Zor mimari, hata ayıklama, güvenlik ve performans kararları için danışman",
       "mode": "all",
-      "model": "9router/kimi/k3",
+      "model": "9router/kimi/kimi-k3",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -49,7 +49,7 @@
     "Peganet - Big Boss": {
       "description": "Pure orchestration controller that analyzes requests, selects specialist subagents, coordinates parallel work, and verifies their results without implementing changes itself. Use as the default agent for all development work. Routes complex pentest work to deep-pentester and standard pentest work to pentester.",
       "mode": "primary",
-      "model": "9router/kimi/k3",
+      "model": "9router/kimi/kimi-k3",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -248,7 +248,7 @@
     "planner": {
       "description": "İş planı çıkarma, görev bölümleme, plan kritiği",
       "mode": "all",
-      "model": "9router/kimi/k3",
+      "model": "9router/kimi/kimi-k3",
       "permission": {
         "read": "allow",
         "glob": "allow",
