@@ -7,7 +7,7 @@
     "advisor": {
       "description": "Zor mimari, hata ayıklama, güvenlik ve performans kararları için danışman",
       "mode": "all",
-      "model": "9router/kimi/kimi-k3",
+      "model": "9router/cx/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -49,7 +49,7 @@
     "Peganet - Big Boss": {
       "description": "Pure orchestration controller that analyzes requests, selects specialist subagents, coordinates parallel work, and verifies their results without implementing changes itself. Use as the default agent for all development work. Routes complex pentest work to deep-pentester and standard pentest work to pentester.",
       "mode": "primary",
-      "model": "9router/kimi/kimi-k3",
+      "model": "9router/cx/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -94,7 +94,7 @@
     "code-reviewer": {
       "description": "PR/diff inceleme, kod kalitesi kontrolü",
       "mode": "all",
-      "model": "9router/kimi/kimi-for-coding",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -248,7 +248,7 @@
     "planner": {
       "description": "İş planı çıkarma, görev bölümleme, plan kritiği",
       "mode": "all",
-      "model": "9router/kimi/kimi-k3",
+      "model": "9router/cx/gpt-5.6-luna",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -269,7 +269,7 @@
     "refactoring-specialist": {
       "description": "Temizlik, sadeleştirme, modernizasyon",
       "mode": "all",
-      "model": "9router/kimi/kimi-for-coding",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
