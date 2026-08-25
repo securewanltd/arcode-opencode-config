@@ -73,7 +73,7 @@
     "bug-hunter": {
       "description": "Hata, çökme, başarısız test, beklenmeyen davranış",
       "mode": "all",
-      "model": "9router/ds/deepseek-v4-flash",
+      "model": "cline-pass/cline-pass/kimi-k2.7-code",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "9router/ds/deepseek-v4-flash",
+      "model": "opencode/nemotron-3-ultra-free",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -143,7 +143,7 @@
     "executor": {
       "description": "Kod yazma, düzenleme, özellik uygulama, test ve migration icrası",
       "mode": "all",
-      "model": "9router/ds/deepseek-v4-flash",
+      "model": "cline-pass/cline-pass/kimi-k2.7-code",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -164,7 +164,7 @@
     "explorer": {
       "description": "Kod tabanında hızlı keşif, sembol konumu, çağıranlar",
       "mode": "all",
-      "model": "9router/ds/deepseek-v4-pro",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -248,7 +248,7 @@
     "planner": {
       "description": "İş planı çıkarma, görev bölümleme, plan kritiği",
       "mode": "all",
-      "model": "9router/ds/deepseek-v4-pro",
+      "model": "9router/ds/deepseek-v4-flash",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -269,7 +269,7 @@
     "refactoring-specialist": {
       "description": "Temizlik, sadeleştirme, modernizasyon",
       "mode": "all",
-      "model": "9router/ds/deepseek-v4-flash",
+      "model": "cline-pass/cline-pass/kimi-k2.7-code",
       "permission": {
         "read": "allow",
         "glob": "allow",
