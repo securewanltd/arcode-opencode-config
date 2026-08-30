@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "9router/openrouter/openrouter/free",
       "permission": {
         "read": "allow",
         "glob": "allow",
