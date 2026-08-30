@@ -143,7 +143,7 @@
     "executor": {
       "description": "Kod yazma, düzenleme, özellik uygulama, test ve migration icrası",
       "mode": "all",
-      "model": "cmc/minimax/minimax-m3-free",
+      "model": "9router/cmc/minimax/minimax-m3-free",
       "permission": {
         "read": "allow",
         "glob": "allow",
