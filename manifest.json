@@ -94,7 +94,7 @@
     "code-reviewer": {
       "description": "PR/diff inceleme, kod kalitesi kontrolü",
       "mode": "all",
-      "model": "SecureRouter/cmd/gpt-5.6-terra",
+      "model": "SecureRouter/cmd/gpt-5.6-luna",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -290,7 +290,7 @@
     "researcher": {
       "description": "Resmi doküman, uzak repo, açık kaynak örnek araştırması",
       "mode": "all",
-      "model": "SecureRouter/cmd/gpt-5.6-terra",
+      "model": "SecureRouter/cmd/gpt-5.6-luna",
       "permission": {
         "read": "allow",
         "glob": "allow",
