@@ -49,7 +49,7 @@
     "Peganet - Big Boss": {
       "description": "Pure orchestration controller that analyzes requests, selects specialist subagents, coordinates parallel work, and verifies their results without implementing changes itself. Use as the default agent for all development work. Routes complex pentest work to deep-pentester and standard pentest work to pentester.",
       "mode": "primary",
-      "model": "SecureRouter/ds/deepseek-v4-pro",
+      "model": "SecureRouter/cp/cline-pass/kimi-k3",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -73,7 +73,7 @@
     "bug-hunter": {
       "description": "Hata, çökme, başarısız test, beklenmeyen davranış",
       "mode": "all",
-      "model": "SecureRouter/xkiro/qwen/qwen3.8-max:free",
+      "model": "SecureRouter/ds/deepseek-v4-pro",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -94,7 +94,7 @@
     "code-reviewer": {
       "description": "PR/diff inceleme, kod kalitesi kontrolü",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-flash",
+      "model": "SecureRouter/cmd/gpt-5.6-terra",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "SecureRouter/nvidia/nvidia/nemotron-3-ultra-550b-a55b",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -185,7 +185,7 @@
     "media-analyst": {
       "description": "PDF, görsel, diyagram analizi ve bilgi çıkarımı",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-flash",
+      "model": "SecureRouter/openrouter/minimax/minimax-m3:free",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -206,7 +206,7 @@
     "pentester": {
       "description": "Güvenlik denetimi, threat modeling, zafiyet araştırması",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-pro",
+      "model": "SecureRouter/cmd/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -227,7 +227,7 @@
     "deep-pentester": {
       "description": "Derin ve karmaşık pentest operasyonları, red team, exploit geliştirme, ileri AD/cloud/web güvenliği ve kurumsal pentest raporlaması",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-pro",
+      "model": "SecureRouter/cmd/gpt-5.6-sol",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -290,7 +290,7 @@
     "researcher": {
       "description": "Resmi doküman, uzak repo, açık kaynak örnek araştırması",
       "mode": "all",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "SecureRouter/cmd/gpt-5.6-terra",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -353,7 +353,7 @@
     "frontend": {
       "description": "Frontend geliştirme: UI component, stil, state yönetimi, API entegrasyonu. Frontend kodlama görevleri.",
       "mode": "all",
-      "model": "SecureRouter/xkiro/qwen/qwen3.8-max:free",
+      "model": "SecureRouter/cp/cline-pass/kimi-k2.7-code",
       "permission": {
         "read": "allow",
         "glob": "allow",
