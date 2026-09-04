@@ -73,7 +73,7 @@
     "bug-hunter": {
       "description": "Hata, çökme, başarısız test, beklenmeyen davranış",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-pro",
+      "model": "SecureRouter/combo/bug-hunter",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -94,7 +94,7 @@
     "code-reviewer": {
       "description": "PR/diff inceleme, kod kalitesi kontrolü",
       "mode": "all",
-      "model": "SecureRouter/cmd/gpt-5.6-luna",
+      "model": "SecureRouter/combo/code-reviewer",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -115,7 +115,7 @@
     "documentation-writer": {
       "description": "README, API dokümanı, kullanım rehberi",
       "mode": "all",
-      "model": "SecureRouter/nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "model": "SecureRouter/combo/documentation-writer",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -143,7 +143,7 @@
     "executor": {
       "description": "Kod yazma, düzenleme, özellik uygulama, test ve migration icrası",
       "mode": "all",
-      "model": "SecureRouter/ollama/qwen3.8:latest",
+      "model": "SecureRouter/combo/executor",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -164,7 +164,7 @@
     "explorer": {
       "description": "Kod tabanında hızlı keşif, sembol konumu, çağıranlar",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-flash",
+      "model": "SecureRouter/combo/explorer",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -185,7 +185,7 @@
     "media-analyst": {
       "description": "PDF, görsel, diyagram analizi ve bilgi çıkarımı",
       "mode": "all",
-      "model": "SecureRouter/openrouter/minimax/minimax-m3:free",
+      "model": "SecureRouter/combo/media-analyst",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -206,7 +206,7 @@
     "pentester": {
       "description": "Güvenlik denetimi, threat modeling, zafiyet araştırması",
       "mode": "all",
-      "model": "SecureRouter/cmd/gpt-5.6-sol",
+      "model": "SecureRouter/combo/pentester",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -227,7 +227,7 @@
     "deep-pentester": {
       "description": "Derin ve karmaşık pentest operasyonları, red team, exploit geliştirme, ileri AD/cloud/web güvenliği ve kurumsal pentest raporlaması",
       "mode": "all",
-      "model": "SecureRouter/cmd/gpt-5.6-sol",
+      "model": "SecureRouter/combo/deep-pentester",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -248,7 +248,7 @@
     "planner": {
       "description": "İş planı çıkarma, görev bölümleme, plan kritiği",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-flash",
+      "model": "SecureRouter/combo/planner",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -269,7 +269,7 @@
     "refactoring-specialist": {
       "description": "Temizlik, sadeleştirme, modernizasyon",
       "mode": "all",
-      "model": "SecureRouter/ollama/qwen3.8:latest",
+      "model": "SecureRouter/combo/refactoring-specialist",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -290,7 +290,7 @@
     "researcher": {
       "description": "Resmi doküman, uzak repo, açık kaynak örnek araştırması",
       "mode": "all",
-      "model": "SecureRouter/cmd/gpt-5.6-luna",
+      "model": "SecureRouter/combo/researcher",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -311,7 +311,7 @@
     "devops": {
       "description": "Docker, container, imaj, Dockerfile, docker-compose, registry, CI/CD ve deploy işleri. Docker platformunda çalışırken kullan.",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-pro",
+      "model": "SecureRouter/combo/devops",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -332,7 +332,7 @@
     "backend": {
       "description": "Backend geliştirme: API, servis, veritabanı, iş mantığı, migration. Backend kodlama görevleri.",
       "mode": "all",
-      "model": "SecureRouter/ollama/qwen3.8:latest",
+      "model": "SecureRouter/combo/backend",
       "permission": {
         "read": "allow",
         "glob": "allow",
@@ -353,7 +353,7 @@
     "frontend": {
       "description": "Frontend geliştirme: UI component, stil, state yönetimi, API entegrasyonu. Frontend kodlama görevleri.",
       "mode": "all",
-      "model": "SecureRouter/cp/cline-pass/kimi-k2.7-code",
+      "model": "SecureRouter/combo/frontend",
       "permission": {
         "read": "allow",
         "glob": "allow",
