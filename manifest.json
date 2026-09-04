@@ -28,7 +28,7 @@
     "architect": {
       "description": "Yeni özellik, sistem tasarımı, teknoloji seçimi",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-pro",
+      "model": "SecureRouter/combo/architect",
       "permission": {
         "read": "allow",
         "glob": "allow",
