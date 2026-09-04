@@ -7,7 +7,7 @@
     "advisor": {
       "description": "Zor mimari, hata ayıklama, güvenlik ve performans kararları için danışman",
       "mode": "all",
-      "model": "SecureRouter/ds/deepseek-v4-pro",
+      "model": "SecureRouter/combo/advisor",
       "permission": {
         "read": "allow",
         "glob": "allow",
