@@ -49,7 +49,7 @@
     "Peganet - Big Boss": {
       "description": "Pure orchestration controller that analyzes requests, selects specialist subagents, coordinates parallel work, and verifies their results without implementing changes itself. Use as the default agent for all development work. Routes complex pentest work to deep-pentester and standard pentest work to pentester.",
       "mode": "primary",
-      "model": "SecureRouter/cp/cline-pass/kimi-k3",
+      "model": "SecureRouter/combo/big-boss",
       "permission": {
         "read": "allow",
         "glob": "allow",
